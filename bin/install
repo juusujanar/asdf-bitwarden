@@ -33,7 +33,7 @@ install_bitwarden() {
 
   mkdir -p "${install_path}/bin"
 
-  unzip "${download_path}/bitwarden.zip" -d "${download_path}"
+  unzip -qq "${download_path}/bitwarden.zip" -d "${download_path}"
   cp "${download_path}/bw" "${install_path}/bin/bw"
   chmod +x "${install_path}/bin/bw"
 
