@@ -24,9 +24,19 @@ download_bitwarden () {
 
     # Verify SHA256 hash of the zip file
     # The hash file contains a newline, which doesn't work with sha256sum
-    if ! echo "$(tr -d "\n\r" < ${download_path}/bitwarden-sha256.txt) ${download_path}/bitwarden.zip" | sha256sum --check --status; then
-        echo "SHA256 checksum failed" >&2
-        exit 1
+    # Also, Linux generally has sha256sum, MacOS has shasum, so need to support both
+    if command -v sha256sum &> /dev/null; then
+        if ! echo "$(tr -d "\n\r" < ${download_path}/bitwarden-sha256.txt) ${download_path}/bitwarden.zip" | sha256sum --check --status; then
+            echo "SHA256 checksum failed" >&2
+            exit 1
+        fi
+    elif command -v shasum &> /dev/null; then
+        if ! echo "$(tr -d "\n\r" < ${download_path}/bitwarden-sha256.txt) ${download_path}/bitwarden.zip" | shasum --algorithm 256 --check --status; then
+            echo "SHA256 checksum failed" >&2
+            exit 1
+        fi
+    else
+        echo "sha256sum and shasum not found, skipping checksum check" >&2
     fi
 }
 
